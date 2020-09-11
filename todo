@@ -1,0 +1,5 @@
+***** Quest Search
+x <li>'s were successfully queried
+    x Tested by looping through and clicking each one
+- Extract data from each li
+- Organize data for output
