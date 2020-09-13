@@ -24,6 +24,9 @@ class LabcorpSearch(Search):
         self.service = service
 
     def search(self, limit=100):
+        print(f'[LabCorp Scraper] "Searching for LabCorp PSC Sites within {self.radius} miles of {self.zipcode}..."')
+        print(f'[LabCorp Scraper] "Category: {self.service}"')
+
         # Zipcode search requires pressing an autocomplete option
         # and that doesn't have a 100% success rate with this script
         for attempt in range(5):

@@ -14,6 +14,8 @@ from navs.search import Search
 
 class ConcentraSearch(Search):
     def search(self, limit=100):
+        print(f'[Concentra Scraper] "Searching for Concentra locations near {self.zipcode}..."')
+
         self.driver.get("https://www.concentra.com/urgent-care-centers/#g=&gtext=&glevel=&gstate=")
     
         for _ in range(3):      
@@ -140,6 +142,7 @@ class ConcentraSearch(Search):
             return results       
 
 if __name__ == "__main__":
+    from search import Search
     search = ConcentraSearch(90720)
     results = search.search(limit=5)
     del search
