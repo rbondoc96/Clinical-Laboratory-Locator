@@ -1,14 +1,23 @@
-from navs.labcorp import LabCorpSearch
+import sys
+import time
+import concurrent.futures
+
+from PyQt5 import QtWidgets
+
+# Frontend
+from ui.gui import Ui_MainWindow
+
+# Backend
+from navs.labcorp import LabcorpSearch
 from navs.quest import QuestSearch
 
-lc_search = LabCorpSearch(
-    57007, 
-    radius=100, 
-    service=LabCorpSearch.DRUG_SCREEN_COLLECTION
-)
+start = time.perf_counter()
 
-q_search = QuestSearch(
-    92108,
-)
+app = QtWidgets.QApplication(sys.argv)
+MainWindow = QtWidgets.QMainWindow()
+ui = Ui_MainWindow()
+ui.setupUi(MainWindow)
+ui.init_logic()
+MainWindow.show()
 
-q_search.search()
+app.exec_()

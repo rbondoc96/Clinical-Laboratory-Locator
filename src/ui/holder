@@ -1,0 +1,197 @@
+    def enable_labcorp_buttons(self, enable):
+        self.labcorpBloodwork.setEnabled(enable)
+        self.labcorpDSCollect.setEnabled(enable)
+        self.labcorpDSInstant.setEnabled(enable)
+    
+    def toggle_labcorp_buttons(self):
+        self.enable_labcorp_buttons(
+            not self.labcorpBloodwork.isEnabled()
+        )
+
+    def enable_quest_buttons(self, enable):
+        self.questTspot.setEnabled(enable)
+        self.questDSElectronic.setEnabled(enable)
+
+    def toggle_quest_buttons(self):
+        self.enable_quest_buttons(
+            not self.questTspot.isEnabled()
+        )
+    
+    def enable_gmaps_buttons(self, enable):
+        self.gmapsUrgentCare.setEnabled(enable)
+        self.gmapsOccuHealth.setEnabled(enable)
+    
+    def toggle_gmaps_buttons(self):
+        self.enable_gmaps_buttons(
+            not self.gmapsUrgentCare.isEnabled()
+        )
+
+    def enable_escreen_buttons(self, enable):
+        self.escreenPhys.setEnabled(enable)
+        self.escreenFit.setEnabled(enable)
+        self.escreenDSCollect.setEnabled(enable)
+        self.escreenDSXcup.setEnabled(enable)
+        self.escreenCXR.setEnabled(enable)
+        self.escreenTiters.setEnabled(enable)
+        self.escreenQgold.setEnabled(enable)
+        self.escreenTspot.setEnabled(enable)
+        self.escreenPpd.setEnabled(enable)
+        self.escreenTdapVaccine.setEnabled(enable)
+        self.escreenMmrVaccine.setEnabled(enable)
+        self.escreenVaricellaVaccine.setEnabled(enable)
+        self.escreenHepBVaccine.setEnabled(enable)
+        self.escreenFluVaccine.setEnabled(enable)
+
+    def toggle_escreen_buttons(self):
+        self.enable_escreen_buttons(
+            not self.escreenPhys.isEnabled()
+        )
+
+    def init_logic(self):
+        self.enable_labcorp_buttons(False)
+        self.enable_quest_buttons(False)
+        self.enable_gmaps_buttons(False)
+        self.enable_escreen_buttons(False)
+
+        self.labcorpCheckbox.clicked.connect(self.toggle_labcorp_buttons)
+        self.questCheckbox.clicked.connect(self.toggle_quest_buttons)
+        self.gmapsCheckbox.clicked.connect(self.toggle_gmaps_buttons)
+        self.escreenCheckbox.clicked.connect(self.toggle_escreen_buttons)
+
+        self.searchButton.clicked.connect(self.search)
+
+    def add_labcorp_text(self, text):
+        if type(text) is list and len(text) > 0:
+            camel = CamelCase()
+
+            self.outputBox.append("\n=================== LabCorp ====================")
+            for item in text:
+                distance = item.get("distance")
+                address = item.get("address").strip()
+                hours = camel.hump(item.get("hours"))
+                phone_fax = item.get("phone_fax")
+                services = item.get("services")
+                
+                self.outputBox.append(f"Distance: {distance}")
+                self.outputBox.append(f"Address: {address}")
+                self.outputBox.append(f"Hours: {hours}")
+                self.outputBox.append(f"Phone {phone_fax}")
+                self.outputBox.append(f"Services: {services}")
+                self.outputBox.append("====================")
+
+        else:
+            self.outputBox.append("\nNo LabCorp locations were found.")
+
+    def add_concentra_text(self, text):
+        if type(text) is list and len(text) > 0:
+            self.outputBox.append("\n=============== Concentra Urgent Care ===============")            
+            for obj in text:
+                self.outputBox.append(f"Branch: {obj.get('name')}")
+                self.outputBox.append(f"Distance: {obj.get('distance')}")
+                self.outputBox.append(f"{obj.get('open_status')}")
+                self.outputBox.append(f"{obj.get('address_line_1')}")
+
+                if obj.get("address_line_2") is not None:
+                    self.outputBox.append(f"{obj.get('address_line_2')}")
+
+                self.outputBox.append(f"{obj.get('city')}{obj.get('state')} {obj.get('zipcode')}")
+                self.outputBox.append(f"{obj.get('phone')}")
+                self.outputBox.append(f"{obj.get('fax')}")
+                self.outputBox.append(f"{obj.get('hours')}")
+                self.outputBox.append("====================")
+                
+        else:
+            self.outputBox.append("\nNo Concentra locations were found.")
+
+    def search_complete(self):
+        print("Search Complete")
+
+    def search(self):
+        
+        zipcode = self.zipcode.text() if self.zipcode.text() != "" else None
+        radius = self.radius.currentText()
+        labcorp_checked = self.labcorpCheckbox.checkState() > 0
+        quest_checked = self.questCheckbox.checkState() > 0  
+        gmaps_checked = self.gmapsCheckbox.checkState() > 0
+        escreen_checked = self.escreenCheckbox.checkState() > 0
+        concentra_checked = self.concentraCheckbox.checkState() > 0
+
+        one_is_checked = labcorp_checked or quest_checked or \
+            gmaps_checked or escreen_checked or concentra_checked
+
+        if zipcode is not None:
+            if len(zipcode) == 5:
+                search = SearchEngine(simple_zipcode=True)
+                query = search.by_zipcode(f"{zipcode}")
+
+                # zipcode is None if the zipcode isn't in the uszipcode DB
+                if query.zipcode is None:
+                    self.outputBox.setText(
+                        "Please enter a valid zipcode"
+                    )
+                elif one_is_checked:
+                    self.outputBox.setText(f"[{query.post_office_city} {query.zipcode}] Searching for these locations:")
+                    if labcorp_checked:
+                        self.outputBox.append("     - LabCorp")
+                    if quest_checked:
+                        self.outputBox.append("     - Quest Diagnostics")
+                    if gmaps_checked:
+                        self.outputBox.append("     - Google Maps")
+                    if escreen_checked:
+                        self.outputBox.append("     - eScreen Website")
+                    if concentra_checked:
+                        self.outputBox.append("     - Concentra Urgent Care")            
+                    
+                    # Activate search threads if the boxes are checked
+                    self.threadpool = QtCore.QThreadPool()
+                    if labcorp_checked:
+                        if self.labcorpBloodwork.isChecked():
+                            service = LabcorpSearch.BLOODWORK
+                        elif self.labcorpDSCollect.isChecked():
+                            service = LabcorpSearch.DRUG_SCREEN_COLLECTION
+                        elif self.labcorpDSInstant.isChecked():
+                            service = LabcorpSearch.DRUG_SCREEN_POCT
+                        else:
+                            service = LabcorpSearch.DRUG_SCREEN_COLLECTION
+
+                        thread = SearchWorker(
+                            LabcorpSearch, 
+                            zipcode, 
+                            radius=radius,
+                            service=service
+                        )
+                        thread.signals.result.connect(self.add_labcorp_text)
+                        thread.signals.finished.connect(self.search_complete)
+
+                        self.threadpool.start(thread)
+                    if concentra_checked:
+                        thread = SearchWorker(
+                            ConcentraSearch,
+                            zipcode,
+                            limit=5,
+                        )
+                        thread.signals.result.connect(self.add_concentra_text)
+                        thread.signals.finished.connect(self.search_complete)
+
+                        self.threadpool.start(thread)                
+                elif not one_is_checked:
+                    self.outputBox.setText(
+                        "Please select an option to search"
+                    )
+
+            else:
+                self.outputBox.setText("Please enter a 5 digit zipcode")    
+
+        else:      
+            self.outputBox.setText("Please enter a zipcode")
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    ui.init_logic()
+    MainWindow.show()
+    sys.exit(app.exec_())
