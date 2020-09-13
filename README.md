@@ -1,6 +1,3 @@
- <!-- <p align="center">
-  <img src="https://raw.githubusercontent.com/rbondoc96/Clinic-Locator-and-Database/bcd29ad2c5a8cfb3cfb4b3b06aa2ed25ca7e7433/frontend/src/assets/nav-main-logo.svg">
-</p> -->
 <h1 align="center">Lab Scraper</h1>
 
 <p align="left">
@@ -12,6 +9,12 @@ This project is a collection of web scrapers for extracting location metadata us
 - [Installation](#install)
 - [Usage](#usage)
 - [Known Issues](#issues)
+
+<br>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rbondoc96/lab-scraper/master/imgs/GUI%20v2020-09-13.PNG">
+</p>
+<br>
 
 ## Sites We're Scraping <a name="sites"></a>
 <ul>
@@ -51,24 +54,6 @@ pipenv shell    # Initialize the virtual environment
 pipenv install  # Install Python dependencies
 ```
 
-<h3>Configuring the Frontend</h3>
-
-From the repo root directory, move into the <b>/frontend/</b> directory and run the following command:
-
-```
-npm install
-```
-
-## Usage <a name = "usage"></a>
-
-<h3>Running the Program</h3>
-
-From the <b>/src/</b> directory, run the following command to start the program and the GUI:
-
-```
-python main.py
-```
-
 <h3>Recompiling the GUI</h3>
 
 If any changes were made to the GUI, you will need to do the following:
@@ -87,6 +72,16 @@ If any changes were made to the GUI, you will need to do the following:
     ```
 
 5. After compilation, replace all code from [1] and imports from [2] back into the recompiled gui.py file.
+
+## Usage <a name = "usage"></a>
+
+<h3>Running the Program</h3>
+
+From the <b>/src/</b> directory, run the following command to start the program and the GUI:
+
+```
+python main.py
+```
 
 ## Known Issues <a name = "issues"></a>
 <ul>
