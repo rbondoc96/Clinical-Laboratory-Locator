@@ -635,7 +635,7 @@ class Ui_MainWindow(object):
             for item in text:
                 distance = item.get("distance")
                 address = item.get("address").strip()
-                hours = camel.hump(item.get("hours"))
+                hours = item.get("hours")
                 phone_fax = item.get("phone_fax")
                 services = item.get("services")
                 
@@ -694,7 +694,7 @@ class Ui_MainWindow(object):
             self.outputBox.append("\nNo Concentra locations were found.")
 
     def search_complete(self):
-        print("Search Complete")
+        print('[ThreadPool] "Search Complete"')
 
     def search(self):
         

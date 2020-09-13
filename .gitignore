@@ -1,6 +1,5 @@
 .pytest_cache
 
-/src/navs/__pycache__/
-/src/ui/__pycache__/
 
+**/__pycache__/
 **/debug.log

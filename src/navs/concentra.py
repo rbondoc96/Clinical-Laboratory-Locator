@@ -13,6 +13,13 @@ from tqdm import tqdm
 from navs.search import Search
 
 class ConcentraSearch(Search):
+    def set_params(self, zipcode=None):
+        if zipcode is not None:
+            self.zipcode = zipcode
+
+        else:
+            raise ValueError("Please enter a valid zipcode")
+
     def search(self, limit=100):
         print(f'[Concentra Scraper] "Searching for Concentra locations near {self.zipcode}..."')
 
@@ -51,7 +58,14 @@ class ConcentraSearch(Search):
             print('[Concentra Scraper] "Concentras found, scraping info..."')
             
             limit = limit if limit < len(results) else len(results)
-            for res, index in zip(results, tqdm(range(limit))):
+            for res, index in zip(
+                results, 
+                tqdm(
+                    range(limit),
+                    ncols=55, 
+                    desc="Concentra"
+                )
+            ):
                 if limit > 0:
                     if index >= limit:
                         break

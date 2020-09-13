@@ -68,7 +68,7 @@ class GMapsSearch(Search):
             print('[Google Maps Scraper] "Locations found, scraping info..."')
 
             limit = limit if limit < len(query) else len(query)
-            for index in tqdm(range(limit)):
+            for index in tqdm(range(limit), ncols=55, desc="GMaps"):
                 item = dict()
                 action = ActionChains(self.driver)
                 q = query[index]

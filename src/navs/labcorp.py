@@ -20,8 +20,31 @@ class LabcorpSearch(Search):
 
     def __init__(self, zipcode, radius=25, service=DRUG_SCREEN_COLLECTION):
         Search.__init__(self, zipcode)
-        self.radius = radius
+
+        # Labcorp search only takes these values for the radius
+        radius = int(radius)
+        if radius <= 10:
+            self.radius = 10
+        elif radius <= 25:
+            self.radius = 25
+        elif radius <= 50:
+            self.radius = 50
+        elif radius < 75:
+            self.radius = 75
+        elif radius < 100 and radius > 100:
+            self.radius = 100
+    
         self.service = service
+
+    def set_params(self, zipcode=None, radius=None, service=None):
+        if zipcode is not None and radius is not None and service is not None:
+            self.zipcode = zipcode
+            self.radius = radius
+            self.service = service
+        else:
+            raise ValueError(
+                "Inputs are None. Please enter 'non-None' fields."
+            )
 
     def search(self, limit=100):
         print(f'[LabCorp Scraper] "Searching for LabCorp PSC Sites within {self.radius} miles of {self.zipcode}..."')
@@ -33,10 +56,15 @@ class LabcorpSearch(Search):
             self.driver.get("https://www.labcorp.com/labs-and-appointments/results")
 
             self.driver.implicitly_wait(1)
-            cookies_button = self.driver.find_element_by_id(
-                "onetrust-accept-btn-handler"
-            )
-            cookies_button.click()
+            
+            # On first visit, there is a Cookie Disclaimer to click
+            try:
+                cookies_button = self.driver.find_element_by_id(
+                    "onetrust-accept-btn-handler"
+                )
+                cookies_button.click()
+            except:
+                print('[LabCorp Scraper] "Cookies disclaimer not present."')
 
             address_box = self.driver.find_element_by_id("edit-address-single")
             service_opt = self.driver.find_element_by_css_selector(
@@ -71,7 +99,14 @@ class LabcorpSearch(Search):
             print('[LabCorp Scraper] "LabCorps found, scraping info..."')
 
             limit = limit if limit < len(cards) else len(cards)
-            for card, index in zip(cards, tqdm(range(limit))):
+            for card, index in zip(
+                cards, 
+                tqdm(
+                    range(limit), 
+                    ncols=55,
+                    desc="LabCorp"
+                )
+            ):
                 if limit > 0:
                     if index >= limit:
                         break                
